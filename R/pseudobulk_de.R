@@ -184,5 +184,5 @@ pseudobulk_de = function(input,
                 }
     )
   })
-  results %<>% bind_rows(.id = 'cell_type')
+  results %<>% bind_rows(.id = cell_type_col)#changed "cell_type" to cell_type_col
 }
