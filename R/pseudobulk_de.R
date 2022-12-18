@@ -72,7 +72,8 @@ pseudobulk_de = function(input,
   results = map(pseudobulks, function(x) {
     # create targets matrix
     targets = data.frame(group_sample = colnames(x)) %>%
-      mutate(group = gsub(".*\\:", "", group_sample))
+      mutate(group = gsub(".*\\:", "", group_sample))%>%
+    mutate(subject = gsub("\\:.*", "", group_sample))
     ## optionally, carry over factor levels from entire dataset
     if (is.factor(meta$label)) {
       targets$group %<>% factor(levels = levels(meta$label))
@@ -80,7 +81,7 @@ pseudobulk_de = function(input,
     if (n_distinct(targets$group) > 2)
       return(NULL)
     # create design
-    design = model.matrix(~ group, data = targets)
+    design = model.matrix(~ group+subject, data = targets)
     
     DE = switch(de_method,
                 edgeR = {
@@ -113,7 +114,7 @@ pseudobulk_de = function(input,
                   tryCatch({
                     dds = DESeqDataSetFromMatrix(countData = x,
                                                  colData = targets,
-                                                 design = ~ group)
+                                                 design = ~ group+subject)
                     dds = switch(de_type,
                                  Wald = {
                                    dds = try(DESeq(dds,
